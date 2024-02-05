@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -23,33 +24,46 @@ namespace sm_coding_challenge.Controllers
             return View();
         }
 
+        /// <summary>
+        /// Get players by ids
+        /// Only one endpoint for all player requests to reduce code duplication.
+        /// </summary>
         [HttpGet]
-        public IActionResult Player(string id)
+        public async Task<IActionResult> Players(string ids)
         {
-            return Json(_dataProvider.GetPlayerById(id));
-        }
+            try { 
+                if (string.IsNullOrEmpty(ids))
+                {
+                    return BadRequest("No player ids provided");
+                }
 
-        [HttpGet]
-        public IActionResult Players(string ids)
-        {
-            var idList = ids.Split(',');
-            var returnList = new List<PlayerModel>();
-            foreach (var id in idList)
-            {
-                returnList.Add(_dataProvider.GetPlayerById(id));
+                // remove duplicate player ids
+                var idList = ids.Split(',').Distinct();
+
+                return Json(await _dataProvider.GetPlayerByIds(idList));
             }
-            return Json(returnList);
+            catch (Exception e)
+            {
+                return RedirectToAction("Error", new {message = e.Message});
+            }            
         }
 
         [HttpGet]
-        public IActionResult LatestPlayers(string ids)
+        public async Task<IActionResult> LatestPlayers()
         {
-            throw new NotImplementedException("Method Needs to be Implemented");
+            try
+            {
+                return Json(await _dataProvider.GetLatestPlayers());
+            }
+            catch (Exception e)
+            {
+                return RedirectToAction("Error", new {message = e.Message});
+            }
         }
 
-        public IActionResult Error()
+        public IActionResult Error(string message)
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier, Message = message });
         }
     }
 }

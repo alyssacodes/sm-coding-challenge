@@ -3,10 +3,14 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using sm_coding_challenge.Services.DataProvider;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
-builder.Services.AddTransient<IDataProvider, DataProviderImpl>();
+builder.Services.AddSingleton<IDataProvider, DataProviderImpl>();
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddControllersWithViews().AddNewtonsoftJson();
 
 var app = builder.Build();
 IWebHostEnvironment env = app.Environment;

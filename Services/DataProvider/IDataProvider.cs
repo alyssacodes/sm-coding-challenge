@@ -1,9 +1,12 @@
 using sm_coding_challenge.Models;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace sm_coding_challenge.Services.DataProvider
 {
     public interface IDataProvider
-    {
-        PlayerModel GetPlayerById(string id);
+    {       
+        Task<ResponseModel> GetPlayerByIds(IEnumerable<string> ids);
+        Task<ResponseModel> GetLatestPlayers();
     }
 }
